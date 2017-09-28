@@ -64,4 +64,5 @@ class HBETExtractor:
 
 if __name__ == '__main__':
   extractor = HBETExtractor('/tmp/test.txt')
-  print(''.join(extractor.extract()).encode('utf-8'))
+  et = extractor.extract()
+  print(''.join(et))
