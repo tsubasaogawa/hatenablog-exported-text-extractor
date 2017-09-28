@@ -7,7 +7,9 @@ import sys, codecs
 
 regex = {
   'separator': r'^-----',
-  'body': r'^BODY:'
+  'body': r'^BODY:',
+  'html': r'<[^>]+>',
+  'uri': r'https?://'
 }
 pattern = {}
 for key in regex.keys():
@@ -22,7 +24,7 @@ class HBETExtractor:
   def extract(self):
     body_flags = {'separator': False, 'body': False}
     return_items = []
-    item = ''
+    item = []
     with open(self.file) as f:
       for line in f:
         # 以前の行が BODY: だった
@@ -31,11 +33,12 @@ class HBETExtractor:
           if pattern['separator'].match(line):
             body_flags['separator'] = False
             body_flags['body'] = False
-            return_items.append(item)
-            item = ''
+            return_item = self.__remove_waste_chars(''.join(item))
+            return_items.append(return_item)
+            item = []
             continue
           else:
-            item += line.decode('utf-8')
+            item.append(line)
 
         # ヘッダ部
         elif body_flags['separator'] == False and body_flags['body'] == False:
@@ -52,8 +55,12 @@ class HBETExtractor:
           else:
             body_flags['separator'] = False
 
-
     return return_items
+
+  def __remove_waste_chars(self, line):
+    line_no_uri = pattern['uri'].sub('', line)
+    line_no_uri_html = pattern['html'].sub('', line_no_uri)
+    return line_no_uri_html
 
 if __name__ == '__main__':
   extractor = HBETExtractor('/tmp/test.txt')
