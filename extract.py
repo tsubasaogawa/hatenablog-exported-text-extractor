@@ -9,7 +9,7 @@ regex = {
   'separator': r'^-----',
   'body': r'^BODY:',
   'html': r'<[^>]+>',
-  'uri': r'https?://'
+  'uri': r'https?://[a-zA-Z0-9!#$%&-~+,.?/_]+'
 }
 pattern = {}
 for key in regex.keys():
