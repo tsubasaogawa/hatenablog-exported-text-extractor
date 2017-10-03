@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import os
 import re
 import sys, codecs
 
@@ -63,6 +64,11 @@ class HBETExtractor:
     return line_no_uri_html
 
 if __name__ == '__main__':
-  extractor = HBETExtractor('/tmp/test.txt')
+  input_file = sys.argv[1] if len(sys.argv) > 1 else '/tmp/test.txt'
+  if not os.path.exists(input_file):
+    sys.stderr.write('No file exists: ', input_file)
+    sys.exit(1)
+
+  extractor = HBETExtractor(input_file)
   et = extractor.extract()
   print(''.join(et))
