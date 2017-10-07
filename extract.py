@@ -35,10 +35,9 @@ class HBETExtractor:
     item = []
     with open(self.file) as f:
       for line in f:
-        # 以前の行が BODY: だった
+        # check if last line included 'BODY:'
         if body_flags['separator'] == True and body_flags['body'] == True:
-          # BODY: フィールド終了
-          if pattern['separator'].match(line):
+          # BODY section ends
           if patterns['separator'].match(line):
             body_flags['separator'] = False
             body_flags['body'] = False
@@ -46,19 +45,20 @@ class HBETExtractor:
             return_items.append(return_item)
             item = []
             continue
+          # BODY section continues
           else:
             item.append(line)
 
-        # ヘッダ部
+        # Header section check
         elif body_flags['separator'] == False and body_flags['body'] == False:
-          # ---- を探す
+          # start separator?
           if patterns['separator'].match(line):
             body_flags['separator'] = True
             continue
 
-        # 前行が ----- だった
+        # last line was separator?
         elif body_flags['separator'] == True:
-          # BODY: であるかどうか
+          # This line includes 'BODY'?
           if patterns['body'].match(line):
             body_flags['body'] = True
           else:
