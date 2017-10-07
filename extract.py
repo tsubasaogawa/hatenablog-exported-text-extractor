@@ -80,9 +80,11 @@ def usage():
 if __name__ == '__main__':
   input_file = sys.argv[1] if len(sys.argv) == 2 else usage()
   if not os.path.exists(input_file):
-    sys.stderr.write('No file exists: ', input_file)
+    sys.stderr.write('No file exists: %s\n' % input_file)
     sys.exit(1)
 
   extractor = HBETExtractor(input_file)
-  et = extractor.extract()
-  print(''.join(et))
+  extracted_text = ''.join(extractor.extract())
+  
+  print(extracted_text, "\n")
+  sys.exit(0)
