@@ -4,8 +4,6 @@ import os
 import re
 import sys, codecs
 
-# sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
-
 regex = {
   'separator': r'^-----',
   'body': r'^BODY:',
