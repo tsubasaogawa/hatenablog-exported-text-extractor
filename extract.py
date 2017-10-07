@@ -73,8 +73,12 @@ class HBETExtractor:
 
     return line
 
+def usage():
+  sys.stderr.write('%s: no input file\n' % sys.argv[0])
+  sys.exit(1)
+
 if __name__ == '__main__':
-  input_file = sys.argv[1] if len(sys.argv) > 1 else '/tmp/test.txt'
+  input_file = sys.argv[1] if len(sys.argv) == 2 else usage()
   if not os.path.exists(input_file):
     sys.stderr.write('No file exists: ', input_file)
     sys.exit(1)
