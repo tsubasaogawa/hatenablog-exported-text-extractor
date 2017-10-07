@@ -4,17 +4,26 @@ import os
 import re
 import sys, codecs
 
+# regex patterns
 regex = {
   'separator': r'^-----',
   'body': r'^BODY:',
   'html': r'<[^>]+>',
-  'uri': r'https?://[a-zA-Z0-9!#$%&-~+,.?/_]+'
+  'uri': r'https?://[a-zA-Z0-9!#$%&-~+,.?/_]+',
+  'blank_line': r'$^' # no match
 }
-pattern = {}
-for key in regex.keys():
-  pattern[key] = re.compile(regex[key])
 
-REMOVE_TAG = True
+# Remove it from text if True
+remove_flags = {
+  'html': True,
+  'uri': True,
+  'blank_line': True
+}
+
+# compile regexes
+patterns = {}
+for key in regex.keys():
+  patterns[key] = re.compile(regex[key])
 
 class HBETExtractor:
   def __init__(self, file):
@@ -30,6 +39,7 @@ class HBETExtractor:
         if body_flags['separator'] == True and body_flags['body'] == True:
           # BODY: フィールド終了
           if pattern['separator'].match(line):
+          if patterns['separator'].match(line):
             body_flags['separator'] = False
             body_flags['body'] = False
             return_item = self.__remove_waste_chars(''.join(item))
@@ -42,14 +52,14 @@ class HBETExtractor:
         # ヘッダ部
         elif body_flags['separator'] == False and body_flags['body'] == False:
           # ---- を探す
-          if pattern['separator'].match(line):
+          if patterns['separator'].match(line):
             body_flags['separator'] = True
             continue
 
         # 前行が ----- だった
         elif body_flags['separator'] == True:
           # BODY: であるかどうか
-          if pattern['body'].match(line):
+          if patterns['body'].match(line):
             body_flags['body'] = True
           else:
             body_flags['separator'] = False
@@ -57,9 +67,11 @@ class HBETExtractor:
     return return_items
 
   def __remove_waste_chars(self, line):
-    line_no_uri = pattern['uri'].sub('', line)
-    line_no_uri_html = pattern['html'].sub('', line_no_uri)
-    return line_no_uri_html
+    for pattern in remove_flags.keys():
+      if remove_flags[pattern]:
+        line = patterns[pattern].sub('', line)
+
+    return line
 
 if __name__ == '__main__':
   input_file = sys.argv[1] if len(sys.argv) > 1 else '/tmp/test.txt'
