@@ -45,7 +45,7 @@ CATEGORY: music
 $ python ./extractor.py [input file] > [output file]
 
 # or stdin
-$ cat [input file] | python ./extractor.py
+$ cat [input file] | python ./extractor.py > [output file]
 ```
 
 ## Requirements
