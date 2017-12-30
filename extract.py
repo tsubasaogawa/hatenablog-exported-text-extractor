@@ -3,6 +3,7 @@
 import os
 import re
 import sys, codecs
+import tempfile
 
 # regex patterns
 regex = {
@@ -73,18 +74,37 @@ class HBETExtractor:
 
     return line
 
-def usage():
-  sys.stderr.write('%s: no input file\n' % sys.argv[0])
+def usage_and_exit():
+  sys.stderr.write("usage: %s [input file] > [output file]\n" % sys.argv[0])
   sys.exit(1)
 
 if __name__ == '__main__':
-  input_file = sys.argv[1] if len(sys.argv) == 2 else usage()
-  if not os.path.exists(input_file):
-    sys.stderr.write('No file exists: %s\n' % input_file)
-    sys.exit(1)
+  temp_file = None
+  input_file = None
 
+  # args check
+  if len(sys.argv) == 1:
+    stdin = sys.stdin.read()
+    if stdin.rstrip() != '':
+      with tempfile.NamedTemporaryFile(delete=False) as temp:
+        temp_file = temp.name
+        input_file = temp_file
+        temp.write(stdin.encode())
+    else:
+      usage_and_exit()
+  else:
+    input_file = sys.argv[1]
+    if not os.path.exists(input_file):
+      usage_and_exit()
+
+  # instance
   extractor = HBETExtractor(input_file)
+
+  # extract
   extracted_text = ''.join(extractor.extract())
-  
   print(extracted_text, "\n")
+
+  if temp_file is not None:
+    os.remove(temp_file)
+
   sys.exit(0)
