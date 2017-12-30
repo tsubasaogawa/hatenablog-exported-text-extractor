@@ -40,7 +40,13 @@ CATEGORY: music
 
 ## Usage
 
-`$ python ./extractor.py [input file] > [output file]`
+```bash
+# use args
+$ python ./extractor.py [input file] > [output file]
+
+# or stdin
+$ cat [input file] | python ./extractor.py
+```
 
 ## Requirements
 
