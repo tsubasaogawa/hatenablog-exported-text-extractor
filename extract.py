@@ -8,44 +8,45 @@ import tempfile
 
 
 class Config:
-  def __init__(self):
-    # regex patterns
-    regex = {
-      'separator': r'^-----',
-      'body': r'^BODY:',
-      'html': r'<[^>]+>',
-      'uri': r'https?://[a-zA-Z0-9!#$%&-~+,.?/_]+',
-      'blank_line': r'$^'  # no match
-    }
+  # regex patterns
+  regex = {
+    'separator': r'^-----',
+    'body': r'^BODY:',
+    'html': r'<[^>]+>',
+    'uri': r'https?://[a-zA-Z0-9!#$%&-~+,.?/_]+',
+    'blank_line': r'$^'  # no match
+  }
 
-    # Remove it from text if True
-    self.remove_flags = {
-      'html': True,
-      'uri': True,
-      'blank_line': True
-    }
+  # Remove it from text if True
+  remove_flags = {
+    'html': True,
+    'uri': True,
+    'blank_line': True
+  }
 
-    # compile regexes
-    self.patterns = {}
-    for key in regex.keys():
-      self.patterns[key] = re.compile(regex[key])
+  # compile regexes
+  patterns = {}
+  for key in regex.keys():
+    patterns[key] = re.compile(regex[key])
 
-  def get_remove_flags(self):
-    return self.remove_flags
+  @staticmethod
+  def get_remove_flags():
+    return Config.remove_flags
 
-  def get_patterns(self):
-    return self.patterns
+  @staticmethod
+  def get_patterns():
+    return Config.patterns
 
 
 class HBETExtractor:
   def __init__(self, file):
     self.file = file
-    self.config = Config()
 
   def extract(self):
     body_flags = {'separator': False, 'body': False}
-    return_items = item = []
-    patterns = self.config.get_patterns()
+    return_items = []
+    item = []
+    patterns = Config.get_patterns()
 
     with open(self.file) as f:
       for line in f:
@@ -80,10 +81,10 @@ class HBETExtractor:
     return return_items
 
   def _remove_waste_chars(self, line):
-    remove_flags = self.config.get_remove_flags()
+    remove_flags = Config.get_remove_flags()
     for pattern in remove_flags.keys():
       if remove_flags[pattern]:
-        line = patterns[pattern].sub('', line)
+        line = Config.get_patterns()[pattern].sub('', line)
 
     return line
 
