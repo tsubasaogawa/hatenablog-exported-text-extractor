@@ -14,6 +14,7 @@ class Config:
     'body': r'^BODY:',
     'html': r'<[^>]+>',
     'uri': r'https?://[a-zA-Z0-9!#$%&-~+,.?/_]+',
+    'blog_card': r'.*class=\"embed-card embed-blogcard\".*',
     'blank_line': r'$^'  # no match
   }
 
@@ -21,7 +22,8 @@ class Config:
   remove_flags = {
     'html': True,
     'uri': True,
-    'blank_line': True
+    'blank_line': True,
+    'blog_card': True
   }
 
   # compile regexes
@@ -48,7 +50,7 @@ class HBETExtractor:
     item = []
     patterns = Config.get_patterns()
 
-    with open(self.file) as f:
+    with open(self.file, encoding='utf-8') as f:
       for line in f:
         # check if last line included 'BODY:'
         if body_flags['separator'] is True and body_flags['body'] is True:
@@ -61,6 +63,9 @@ class HBETExtractor:
             continue
           # BODY section continues
           else:
+            # This line includes Blog cards?
+            if Config.get_remove_flags()['blog_card'] and patterns['blog_card'].match(line):
+              continue
             item.append(line)
 
         # Header section check
